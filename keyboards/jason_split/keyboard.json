@@ -7,13 +7,15 @@
   "bootloader": "rp2040",
   "diode_direction": "COL2ROW",
 
-  "matrix_pins": {
-    "cols": ["GP23", "GP24", "GP25"],
-    "rows": ["GP3", "GP4"]
+  "matrix_size": {
+    "rows": 4,
+    "cols": 3
   },
 
-  "split": {
-    "soft_serial_pin": "GP1"
+  "usb": {
+    "vid": "0xFEED",
+    "pid": "0x0000",
+    "device_version": "1.0.0"
   },
 
   "features": {
@@ -23,10 +25,8 @@
     "nkro": true
   },
 
-  "usb": {
-    "vid": "0xFEED",
-    "pid": "0x0000",
-    "device_version": "1.0.0"
+  "split": {
+    "bootmagic": { "matrix": [0, 0] }
   },
 
   "layouts": {
