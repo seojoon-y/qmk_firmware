@@ -21,19 +21,11 @@
   "features": {
     "bootmagic": true,
     "extrakey": true,
-    "nkro": true,
-    "encoder": true
+    "nkro": true
   },
 
   "split": {
     "bootmagic": { "matrix": [0, 0] }
-  },
-
-  "encoder": {
-    "enabled": true,
-    "rotary": [
-      { "pin_a": "GP28", "pin_b": "GP29", "resolution": 4 }
-    ]
   },
 
   "modules": ["getreuer/orbital_mouse"],

@@ -1,22 +1,7 @@
 #pragma once
 
-// #define VENDOR_ID 0xFEED
-// #define PRODUCT_ID 0x0000
-// #define DEVICE_VER 0x0001
-// #define MANUFACTURER "Seojoon_Yeon"
-// #define PRODUCT "jason_orbital"
-
-// #define MATRIX_ROWS 4
-// #define MATRIX_COLS 3
-
 #define MATRIX_ROW_PINS { GP3, GP4 }
 #define MATRIX_COL_PINS { GP23, GP24, GP25 }
-
-// #define DIODE_DIRECTION ROW2COL
-
-// #define ENCODER_A_PINS { GP28 }
-// #define ENCODER_B_PINS { GP29 }
-// #define ENCODER_RESOLUTION 4
 
 #define EE_HANDS
 #define SPLIT_USB_DETECT
@@ -27,3 +12,11 @@
 #define SERIAL_USART_RX_PIN GP1
 
 #define DEBOUNCE 5
+
+#define ENCODER_A_PINS        { GP28 }
+#define ENCODER_B_PINS        { GP29 }
+#define ENCODER_A_PINS_RIGHT  { GP28 }
+#define ENCODER_B_PINS_RIGHT  { GP29 }
+
+#define ENCODER_RESOLUTIONS        { 4 }
+#define ENCODER_RESOLUTIONS_RIGHT  { 4 }
