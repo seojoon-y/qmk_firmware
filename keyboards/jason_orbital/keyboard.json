@@ -37,6 +37,8 @@
     ]
   },
 
+  "modules": ["getreuer/orbital_mouse"],
+  
   "layouts": {
     "LAYOUT": {
       "layout": [
