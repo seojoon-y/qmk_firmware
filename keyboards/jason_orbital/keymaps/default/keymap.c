@@ -15,7 +15,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (is_keyboard_left()) {
+    // if (is_keyboard_left()) {
+    if (index == 0) {
         if (clockwise) {
             tap_code16(KC_E);   // rotate right
         } else {

@@ -33,12 +33,11 @@
   },
 
   "split": {
-      "soft_serial_pin": "GP1",
-      "bootmagic": {
-          "matrix": [0, 0]
-      }
+    "enabled": true,
+    "main": "left",
+    "bootmagic": { "matrix": [0, 0] }
   },
-  
+
   "layouts": {
     "LAYOUT": {
       "layout": [
