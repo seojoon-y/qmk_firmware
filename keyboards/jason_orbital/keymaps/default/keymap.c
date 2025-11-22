@@ -9,23 +9,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         OM_L, OM_U, OM_R,
         KC_A, OM_D, KC_D,
 
-        KC_Y, KC_U, KC_I,
-        KC_H, KC_J, KC_K
+        OM_L, OM_U, OM_R,
+        KC_G, OM_D, KC_F
     )
 };
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) {
+    if (is_keyboard_left()) {
         if (clockwise) {
-            tap_code16(KC_A);   // rotate right
+            tap_code16(KC_E);   // rotate right
         } else {
-            tap_code16(KC_B);   // rotate left
+            tap_code16(KC_F);   // rotate left
         }
     } else {
         if (clockwise) {
-            tap_code16(KC_C);   // move forward
+            tap_code16(KC_G);   // move forward
         } else {
-            tap_code16(KC_D);   // move backward
+            tap_code16(KC_H);   // move backward
         }
     }
     return false;

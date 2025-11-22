@@ -4,7 +4,9 @@
 #define MATRIX_COL_PINS { GP23, GP24, GP25 }
 
 #define EE_HANDS
-#define SPLIT_USB_DETECT
+// #define SPLIT_USB_DETECT
+// #define MASTER_LEFT
+
 
 #define SERIAL_USART_FULL_DUPLEX
 #define SERIAL_USART_PIN_SWAP
