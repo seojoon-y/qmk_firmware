@@ -16,3 +16,7 @@ POINTING_DEVICE_ENABLE = no
 # Encoder
 ENCODER_ENABLE = yes
 ENCODER_MAP_ENABLE = no
+
+# Orbital mouse
+SRC += features/orbital_mouse.c
+MOUSE_ENABLE = yes

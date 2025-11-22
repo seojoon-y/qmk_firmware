@@ -31,7 +31,7 @@
       { "pin_a": "GP28", "pin_b": "GP29", "resolution": 4 }
     ]
   },
-
+  
   "split": {
     "enabled": true,
     "main": "left",
