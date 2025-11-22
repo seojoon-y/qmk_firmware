@@ -168,9 +168,13 @@
  // Instantly move the Orbital Mouse by a small increment in the specified direction.
  // @param dir +1 for forward, -1 for backward.
 
+ // Default step and turn values for instant motion.
+ static const uint8_t DEFAULT_STEP_SPEED = 20;
+ static const uint16_t DEFAULT_TURN_STEP = 500;
+
  void orbital_mouse_instant_step(int dir) {
    // Apply a speed multiplier of 10 to the step size.
-   uint8_t speed = (state.speed_curve ? state.speed_curve[0] : 24) * 10; // default step size * 10
+   uint8_t speed = (state.speed_curve ? state.speed_curve[0] : DEFAULT_STEP_SPEED) * 10;
    int8_t move_sign = (dir > 0) ? -1 : 1; // +1 (forward) -> -; -1 (backward) -> +
    state.x += move_sign * scaled_sin(speed, state.angle >> 8);
    state.y += move_sign * scaled_cos(speed, state.angle >> 8);
@@ -187,7 +191,7 @@
  // @param dir +1 for right turn, -1 for left turn.
  void orbital_mouse_instant_turn(int dir) {
    // Apply a speed multiplier of 10 to the turn step.
-   uint16_t angle_step = (state.speed_curve ? 256 : 256) * 10; // default turn step * 10
+   uint16_t angle_step = state.speed_curve ? DEFAULT_TURN_STEP : DEFAULT_TURN_STEP;
    int8_t turn_sign = (dir > 0) ? 1 : -1;
    state.angle = (uint16_t)(state.angle + turn_sign * angle_step);
    if (dir == 0) return; // No rotation if direction is zero.
