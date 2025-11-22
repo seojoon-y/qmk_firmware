@@ -20,3 +20,4 @@ ENCODER_MAP_ENABLE = no
 # Orbital mouse
 SRC += features/orbital_mouse.c
 MOUSE_ENABLE = yes
+DIGITIZER_ENABLE = yes
