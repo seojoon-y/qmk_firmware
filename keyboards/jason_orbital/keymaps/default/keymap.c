@@ -1,6 +1,16 @@
 #include QMK_KEYBOARD_H
 #include "features/orbital_mouse.h"
 #include "digitizer.h"
+#include "analog.h"
+#include <math.h>
+
+
+#define ANALOG_JOYSTICK_X_AXIS_PIN_LEFT GP26
+#define ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT GP27
+
+#define ANALOG_JOYSTICK_X_AXIS_PIN_RIGHT GP28
+#define ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT GP29
+
 
 uint8_t encoder_counter = 0;
 
@@ -37,13 +47,19 @@ static void teleport_corner(uint8_t c) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT(
-        CNR_TL, OM_U, CNR_TR,
-        CNR_BL, OM_D, CNR_BR,
+        KC_A, KC_A, KC_A,
+        KC_C, KC_C, KC_C,
 
-        KC_D, OM_L, KC_D,
-        KC_B, OM_R, KC_B
+        KC_D, KC_D, KC_D,
+        KC_B, KC_B, KC_B
     )
 };
+
+// CNR_TL, OM_U, CNR_TR,
+// CNR_BL, OM_D, CNR_BR,
+
+// KC_D, OM_L, KC_D,
+// KC_B, OM_R, KC_B
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     if (!process_orbital_mouse(keycode, record)) {
@@ -78,28 +94,79 @@ void housekeeping_task_user(void) {
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
     encoder_counter = (encoder_counter + 1) % 2;
-    bool is_test = false;
+    bool is_test = true;
 
-    if (encoder_counter % 2 == 0) {
-        return false;
-    }
+    // if (encoder_counter % 2 == 0) {
+    //     return false;
+    // }
 
     if (index == 0) {
         if (clockwise) {
-            if (is_test) tap_code16(KC_A);
-            orbital_mouse_instant_turn(-1);
+            if (is_test) {
+                tap_code16(KC_A);
+            } else {
+                // orbital_mouse_instant_turn(-1);
+                orbital_mouse_instant_step(1);
+            }
         } else {
-            if (is_test) tap_code16(KC_B);
-            orbital_mouse_instant_turn(1);
+            if (is_test) {
+                tap_code16(KC_B);
+            } else {
+                // orbital_mouse_instant_turn(1);
+                orbital_mouse_instant_step(1);
+            }
+                
         }
     } else {
         if (clockwise) {
-            if (is_test) tap_code16(KC_D);
-            orbital_mouse_instant_step(-1);
+            if (is_test) {
+                tap_code16(KC_D);
+            } else {
+                orbital_mouse_instant_step(1);
+            }
+                
         } else {
-            if (is_test) tap_code16(KC_C);
-            orbital_mouse_instant_step(1);
+            if (is_test) {
+                tap_code16(KC_C);
+            } else {
+                orbital_mouse_instant_step(1);
+            }
         }
     }
     return false;
+}
+
+uint8_t get_orbital_angle_from_radians(float rad) {
+    float two_pi = 6.283185307179586f;
+    float norm = rad / two_pi;
+    while (norm < 0.0f) norm += 1.0f;
+    while (norm >= 1.0f) norm -= 1.0f;
+    return (uint8_t)(norm * 64.0f);
+}
+
+void matrix_scan_user(void) {
+    int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 516.5;
+    int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 516.5;
+
+    int16_t right_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_RIGHT) - 261;
+    int16_t right_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT) - 224;
+
+    int16_t dx = left_dx + right_dx;
+    int16_t dy = left_dy + right_dy;
+
+    uprintf("X=%d Y=%d\n", dx, dy);
+
+    const int16_t joyDeadzone = 70;
+    float mx = (float)dx;
+    float my = (float)dy;
+
+    if (abs(dx) < joyDeadzone && abs(dy) < joyDeadzone) return;
+
+    // uprintf("dx=%d dy=%d   mx=%f my=%f\n", dx, dy, mx, my);
+
+    // move_by(mx, my);
+
+    float angle_left = atan2f(my, mx);
+    float orbital_angle = angle_left + 1.57079632679f;
+    set_orbital_mouse_angle(get_orbital_angle_from_radians(orbital_angle));
 }

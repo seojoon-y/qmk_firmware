@@ -173,3 +173,5 @@
 
  /** Instantly rotate the Orbital Mouse by a small increment in the specified direction. */
  void orbital_mouse_instant_turn(int dir);
+
+ void move_by(float dx, float dy);

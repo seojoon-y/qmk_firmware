@@ -21,3 +21,6 @@ ENCODER_MAP_ENABLE = no
 SRC += features/orbital_mouse.c
 MOUSE_ENABLE = yes
 DIGITIZER_ENABLE = yes
+
+ANALOG_DRIVER_REQUIRED = yes
+CONSOLE_ENABLE = yes

@@ -170,11 +170,11 @@
 
  // Default step and turn values for instant motion.
  static const uint8_t DEFAULT_STEP_SPEED = 20;
- static const uint16_t DEFAULT_TURN_STEP = 500;
+ static const uint16_t DEFAULT_TURN_STEP = 70;
 
  void orbital_mouse_instant_step(int dir) {
    // Apply a speed multiplier of 10 to the step size.
-   uint8_t speed = (state.speed_curve ? state.speed_curve[0] : DEFAULT_STEP_SPEED) * 10;
+   uint8_t speed = DEFAULT_STEP_SPEED; // (state.speed_curve ? state.speed_curve[0] : DEFAULT_STEP_SPEED) * 10;
    int8_t move_sign = (dir > 0) ? -1 : 1; // +1 (forward) -> -; -1 (backward) -> +
    state.x += move_sign * scaled_sin(speed, state.angle >> 8);
    state.y += move_sign * scaled_cos(speed, state.angle >> 8);
@@ -191,13 +191,22 @@
  // @param dir +1 for right turn, -1 for left turn.
  void orbital_mouse_instant_turn(int dir) {
    // Apply a speed multiplier of 10 to the turn step.
-   uint16_t angle_step = state.speed_curve ? DEFAULT_TURN_STEP : DEFAULT_TURN_STEP;
+   uint16_t angle_step = DEFAULT_TURN_STEP; // state.speed_curve ? DEFAULT_TURN_STEP : DEFAULT_TURN_STEP;
    int8_t turn_sign = (dir > 0) ? 1 : -1;
    state.angle = (uint16_t)(state.angle + turn_sign * angle_step);
    if (dir == 0) return; // No rotation if direction is zero.
    // No positional movement; just update immediate angle and send report (no x,y move).
    state.report.x = 0;
    state.report.y = 0;
+   host_mouse_send(&state.report);
+ }
+
+
+ void move_by(float dx, float dy) {
+   state.x += dx;
+   state.y += dy;
+   state.report.x = state.x / 256;
+   state.report.y = state.y / 256;
    host_mouse_send(&state.report);
  }
 
