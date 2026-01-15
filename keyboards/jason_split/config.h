@@ -6,8 +6,8 @@
 #define MANUFACTURER "Seojoon_Yeon"
 #define PRODUCT "jason_split"
 
-#define MATRIX_ROWS 4
-#define MATRIX_COLS 3
+#define MATRIX_ROWS 6
+#define MATRIX_COLS 6
 
 #define MATRIX_ROW_PINS { GP3, GP4 }
 #define MATRIX_COL_PINS { GP23, GP24, GP25 }
