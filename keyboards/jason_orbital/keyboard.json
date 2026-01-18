@@ -1,12 +1,12 @@
 {
   "manufacturer": "Seojoon Yeon",
-  "keyboard_name": "jason_orbital",
   "maintainer": "Seojoon Yeon",
-
+  "keyboard_name": "jason_orbital",
+  
   "processor": "RP2040",
   "bootloader": "rp2040",
   "diode_direction": "ROW2COL",
-
+  
   "matrix_size": {
     "rows": 6,
     "cols": 6
@@ -17,7 +17,7 @@
       "pid": "0x3435",
       "device_version": "0.0.1"
   },
-
+  "modules": ["getreuer/custom_shift_keys"],
   "features": {
     "bootmagic": true,
     "extrakey": true,
@@ -27,8 +27,8 @@
   "encoder": {
     "enabled": true,
     "rotary": [
-      { "pin_a": "GP9", "pin_b": "GP10", "resolution": 4 },
-      { "pin_a": "GP7", "pin_b": "GP8", "resolution": 4 }
+      { "pin_a": "GP9", "pin_b": "GP10", "resolution": 2 },
+      { "pin_a": "GP7", "pin_b": "GP8", "resolution": 2 }
     ]
   },
   
@@ -41,12 +41,12 @@
   "layouts": {
     "LAYOUT": {
       "layout": [
-        { "matrix": [0, 0], "x": 0, "y": 0 },
-        { "matrix": [0, 1], "x": 1, "y": 0 },
-        { "matrix": [0, 2], "x": 2, "y": 0 },
-        { "matrix": [0, 3], "x": 3, "y": 0 },
-        { "matrix": [0, 4], "x": 4, "y": 0 },
-        { "matrix": [0, 5], "x": 5, "y": 0 },
+        { "matrix": [2, 0], "x": 0, "y": 2 },
+        { "matrix": [2, 1], "x": 1, "y": 2 },
+        { "matrix": [2, 2], "x": 2, "y": 2 },
+        { "matrix": [2, 3], "x": 3, "y": 2 },
+        { "matrix": [2, 4], "x": 4, "y": 2 },
+        { "matrix": [2, 5], "x": 5, "y": 2 },
 
         { "matrix": [1, 0], "x": 0, "y": 1 },
         { "matrix": [1, 1], "x": 1, "y": 1 },
@@ -55,33 +55,33 @@
         { "matrix": [1, 4], "x": 4, "y": 1 },
         { "matrix": [1, 5], "x": 5, "y": 1 },
 
-        { "matrix": [2, 0], "x": 0, "y": 2 },
-        { "matrix": [2, 1], "x": 1, "y": 2 },
-        { "matrix": [2, 2], "x": 2, "y": 2 },
-        { "matrix": [2, 3], "x": 3, "y": 2 },
-        { "matrix": [2, 4], "x": 4, "y": 2 },
-        { "matrix": [2, 5], "x": 5, "y": 2 },
+        { "matrix": [0, 0], "x": 0, "y": 0 },
+        { "matrix": [0, 1], "x": 1, "y": 0 },
+        { "matrix": [0, 2], "x": 2, "y": 0 },
+        { "matrix": [0, 3], "x": 3, "y": 0 },
+        { "matrix": [0, 4], "x": 4, "y": 0 },
+        { "matrix": [0, 5], "x": 5, "y": 0 },
 
-        { "matrix": [3, 0], "x": 5, "y": 3 },
-        { "matrix": [3, 1], "x": 4, "y": 3 },
-        { "matrix": [3, 2], "x": 3, "y": 3 },
-        { "matrix": [3, 3], "x": 2, "y": 3 },
-        { "matrix": [3, 4], "x": 1, "y": 3 },
-        { "matrix": [3, 5], "x": 0, "y": 3 },
+        { "matrix": [5, 5], "x": 5, "y": 5 },
+        { "matrix": [5, 4], "x": 4, "y": 5 },
+        { "matrix": [5, 3], "x": 3, "y": 5 },
+        { "matrix": [5, 2], "x": 2, "y": 5 },
+        { "matrix": [5, 1], "x": 1, "y": 5 },
+        { "matrix": [5, 0], "x": 0, "y": 5 },
 
-        { "matrix": [4, 0], "x": 5, "y": 4 },
-        { "matrix": [4, 1], "x": 4, "y": 4 },
-        { "matrix": [4, 2], "x": 3, "y": 4 },
-        { "matrix": [4, 3], "x": 2, "y": 4 },
-        { "matrix": [4, 4], "x": 1, "y": 4 },
-        { "matrix": [4, 5], "x": 0, "y": 4 },
+        { "matrix": [4, 5], "x": 5, "y": 4 },
+        { "matrix": [4, 4], "x": 4, "y": 4 },
+        { "matrix": [4, 3], "x": 3, "y": 4 },
+        { "matrix": [4, 2], "x": 2, "y": 4 },
+        { "matrix": [4, 1], "x": 1, "y": 4 },
+        { "matrix": [4, 0], "x": 0, "y": 4 },
 
-        { "matrix": [5, 0], "x": 5, "y": 5 },
-        { "matrix": [5, 1], "x": 4, "y": 5 },
-        { "matrix": [5, 2], "x": 3, "y": 5 },
-        { "matrix": [5, 3], "x": 2, "y": 5 },
-        { "matrix": [5, 4], "x": 1, "y": 5 },
-        { "matrix": [5, 5], "x": 0, "y": 5 }
+        { "matrix": [3, 5], "x": 5, "y": 3 },
+        { "matrix": [3, 4], "x": 4, "y": 3 },
+        { "matrix": [3, 3], "x": 3, "y": 3 },
+        { "matrix": [3, 2], "x": 2, "y": 3 },
+        { "matrix": [3, 1], "x": 1, "y": 3 },
+        { "matrix": [3, 0], "x": 0, "y": 3 }
       ]
     }
   }

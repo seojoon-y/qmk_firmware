@@ -19,6 +19,8 @@ ENCODER_MAP_ENABLE = no
 
 # Orbital mouse
 SRC += features/orbital_mouse.c
+SRC += magic.c
+
 MOUSE_ENABLE = yes
 DIGITIZER_ENABLE = yes
 
