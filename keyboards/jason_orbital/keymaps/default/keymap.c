@@ -8,7 +8,15 @@
 #include "shared.h"
 #include "host.h"
 #include <math.h>
+#include "transactions.h"
+#include "split_util.h"
+#include "timer.h"
 
+
+typedef struct {
+    int16_t dx;
+    int16_t dy;
+} joy_s2m_t;
 
 #define ANALOG_JOYSTICK_X_AXIS_PIN_LEFT GP27
 #define ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT GP26
@@ -24,6 +32,20 @@ enum layer_names {
     _R_MOD,
 
 };
+
+
+void right_joy_slave_handler(uint8_t in_len, const void *in_data, uint8_t out_len, void *out_data) {
+    joy_s2m_t *o = (joy_s2m_t *)out_data;
+    o->dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_RIGHT) - 498;
+    o->dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT) - 506;
+}
+
+void keyboard_post_init_user(void) {
+    transaction_register_rpc(RIGHT_JOY, right_joy_slave_handler);
+}
+
+static joy_s2m_t right_joy_cached;
+
 
 // static void teleport_corner(uint8_t c) {
 //     digitizer_in_range_on();
@@ -169,7 +191,17 @@ uint8_t NUM_CUSTOM_SHIFT_KEYS =
     sizeof(custom_shift_keys) / sizeof(custom_shift_key_t);
 
 void housekeeping_task_user(void) {
-    orbital_mouse_task();
+    // orbital_mouse_task();
+    if (!is_keyboard_master()) return;
+
+    static uint32_t last = 0;
+    if (timer_elapsed32(last) < 5) return;
+    last = timer_read32();
+
+    joy_s2m_t tmp;
+    if (transaction_rpc_exec(RIGHT_JOY, 0, 0, sizeof(tmp), &tmp)) {
+        right_joy_cached = tmp;
+    }
 }
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
@@ -199,36 +231,27 @@ uint8_t get_orbital_angle_from_radians(float rad) {
 }
 
 void matrix_scan_user(void) {
+    const int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 520;
+    const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 500;
+    const int16_t right_dx = right_joy_cached.dx;
+    const int16_t right_dy = right_joy_cached.dy;
 
-    // #ifdef MASTER_LEFT
-    // uprintf("left master\n");
-    // #endif
+    const float_t speed_multiplier_left = 0.03;
+    const float_t speed_multiplier_right = 0.01;
+    const float_t deadzone = 25;
 
-    // #ifdef KEYBOARD_LEFT
-    // uprintf("left\n");
-    // #endif
+    float_t dx = 0;
+    float_t dy = 0;
 
-    // #ifdef KEYBOARD_RIGHT
-    // uprintf("right\n");
-    // #endif
+    if (abs(left_dx) > deadzone) dx += left_dx * speed_multiplier_left;
+    if (abs(left_dy) > deadzone) dy += left_dy * speed_multiplier_left * (-1);
+    if (abs(right_dx) > deadzone) dx += right_dx * speed_multiplier_right * (-1);
+    if (abs(right_dy) > deadzone) dy += right_dy * speed_multiplier_right;
 
-    const int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 500;
-    const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 520;
-
-    const int16_t right_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_RIGHT) - 506;
-    const int16_t right_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT) - 498;
-
-    const bool is_left = ((right_dx < -200) && (right_dy < -200)); // is_keyboard_left();
-
-    const float_t deadzone = 20;
-    const float_t speed_multiplier = is_left ? 0.03 : 0.01;
-    const int16_t dx = is_left ? left_dx : right_dx;
-    const int16_t dy = is_left ? left_dy : right_dy;
-
-    if ((abs(dx) > deadzone) || (abs(dy) > deadzone)) {
+    if ((dx != 0) || (dy != 0)) {
         report_mouse_t r = mousekey_get_report();
-        r.x = dx * speed_multiplier;
-        r.y = dy * speed_multiplier;
+        r.x = dx;
+        r.y = dy;
         host_mouse_send(&r);
     }
 
