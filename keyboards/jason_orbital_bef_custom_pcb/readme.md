@@ -5,7 +5,7 @@ Encoder order:
 3. Channel B (green)
 4. Channel A (black)
 
-    qmk flash -kb jason_orbital -km default -bl uf2-split-left
+    qmk flash -kb jason_orbital -km default -bl uf2-split-right
 
 
 https://cyanophage.github.io/playground.html?layout=bldcvjfoux-nrtsgyhaei%2C%5Cqmw%3D%3Bpkz%2F.*%27&mode=ergo&lan=english&thumb=l

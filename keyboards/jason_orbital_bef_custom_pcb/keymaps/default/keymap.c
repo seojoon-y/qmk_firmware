@@ -11,24 +11,18 @@
 #include "transactions.h"
 #include "split_util.h"
 #include "timer.h"
-#include "gpio.h"
 
-#define HAPTIC_IN1 GP8
-#define HAPTIC_IN2 GP9
-typedef enum { HAPTIC_IDLE, HAPTIC_FORWARD, HAPTIC_REVERSE } haptic_state_t;
-static haptic_state_t haptic_state = HAPTIC_IDLE;
-static uint32_t haptic_timer = 0;
 
 typedef struct {
     int16_t dx;
     int16_t dy;
 } joy_s2m_t;
 
-#define ANALOG_JOYSTICK_X_AXIS_PIN_LEFT GP28
-#define ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT GP29
+#define ANALOG_JOYSTICK_X_AXIS_PIN_LEFT GP27
+#define ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT GP26
 
-#define ANALOG_JOYSTICK_X_AXIS_PIN_RIGHT GP27
-#define ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT GP26
+#define ANALOG_JOYSTICK_X_AXIS_PIN_RIGHT GP29
+#define ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT GP28
 
 enum layer_names {
     _APOLLO,
@@ -77,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_APOLLO] = LAYOUT(
         LMAGIC,         KC_L,           KC_D,           KC_C,           TO(_HELIOS),    KC_ENT,
         KC_B,           KC_R,           KC_T,           KC_S,           KC_V,           MO(_L_MOD),
-        HAPTIC_TAP,           KC_Q,           KC_M,           KC_W,           KC_G,           KC_SPC,
+        KC_N,           KC_Q,           KC_M,           KC_W,           KC_G,           KC_SPC,
 
         KC_TAB,         TO(_HESTIA),    KC_F,           KC_O,           KC_U,           RMAGIC,
         MO(_R_MOD),        KC_J,           KC_H,           KC_A,           KC_E,           KC_X,
@@ -87,7 +81,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         LMAGIC,         KC_SCLN,        _______,        _______,        TO(_HESTIA),    KC_ENT,
         _______,        KC_COMM,        KC_DOT,         KC_QUOT,        KC_DQUO,        MO(_L_MOD),
         KC_ESC,         S(KC_GRAVE),    KC_QUES,        _______,        _______,        KC_SPC,
-
+        
         KC_TAB,         TO(_APOLLO),    _______,        KC_AMPR,        KC_DLR,         RMAGIC,
         MO(_R_MOD),        _______,        KC_LBRC,        KC_RBRC,        KC_LPRN,        KC_HASH,
         KC_BSPC,     _______,        KC_COLN,        KC_BSLS,        KC_PERC,        KC_RPRN
@@ -114,7 +108,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,        _______,        _______,        _______,        _______,        _______,
         _______,        _______,        _______,        _______,        _______,        _______,
         _______,        _______,        _______,        _______,        _______,        _______,
-
+        
         _______,        _______,        _______,        _______,        _______,        _______,
         _______,        _______,        KC_LSFT,        KC_LGUI,        KC_LALT,        _______,
         _______,        _______,        _______,        _______,        _______,        KC_LCTL
@@ -159,18 +153,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     //     return true;
     // }
 
-    switch (keycode) {
-        case HAPTIC_TAP:
-            if (record->event.pressed) {
-                setPinOutput(HAPTIC_IN1);
-                setPinOutput(HAPTIC_IN2);
-                writePinHigh(HAPTIC_IN1);
-                writePinLow(HAPTIC_IN2);
-                haptic_state = HAPTIC_FORWARD;
-                haptic_timer = timer_read32() + 3;
-            }
-            return false;
-    }
+    // if (!process_custom_shift_keys(keycode, record)) { return false; }
 
     if (record->event.pressed) {
         const bool should_continue_normal_execution = process_record_user_for_magic(keycode, record);
@@ -181,21 +164,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 }
 
 
+// Key overrides
+const custom_shift_key_t custom_shift_keys[] = {
+  {KC_COMM, KC_QUES},
+  {KC_DOT,  KC_EXLM},
+  {KC_SLSH, KC_BSLS},
+  {KC_BSPC, KC_DEL},
+ 
+  {KC_1, KC_1}, // disable shifting
+  {KC_2, KC_2},
+  {KC_3, KC_3},
+  {KC_4, KC_4},
+  {KC_5, KC_5},
+  {KC_6, KC_6},
+  {KC_7, KC_7},
+  {KC_8, KC_8},
+  {KC_9, KC_9},
+  {KC_0, KC_0},
+  {KC_EQL, KC_EQL},
+  {KC_GRV, KC_GRV},
+  {KC_LBRC, KC_LBRC},
+  {KC_RBRC, KC_RBRC},
+};
+
+uint8_t NUM_CUSTOM_SHIFT_KEYS =
+    sizeof(custom_shift_keys) / sizeof(custom_shift_key_t);
+
 void housekeeping_task_user(void) {
     // orbital_mouse_task();
-    if (haptic_state != HAPTIC_IDLE && timer_read32() >= haptic_timer) {
-        if (haptic_state == HAPTIC_FORWARD) {
-            writePinLow(HAPTIC_IN1);
-            writePinHigh(HAPTIC_IN2);
-            haptic_state = HAPTIC_REVERSE;
-            haptic_timer = timer_read32() + 3;
-        } else {
-            writePinLow(HAPTIC_IN1);
-            writePinLow(HAPTIC_IN2);
-            haptic_state = HAPTIC_IDLE;
-        }
-    }
-
     if (!is_keyboard_master()) return;
 
     static uint32_t last = 0;
@@ -236,7 +232,7 @@ uint8_t get_orbital_angle_from_radians(float rad) {
 
 void matrix_scan_user(void) {
     const int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 520;
-    const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 505;
+    const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 500;
     const int16_t right_dx = right_joy_cached.dx;
     const int16_t right_dy = right_joy_cached.dy;
 
@@ -246,17 +242,17 @@ void matrix_scan_user(void) {
 
     float_t dx = 0;
     float_t dy = 0;
-
-    if (abs(left_dx) > deadzone) dx -= left_dx * speed_multiplier_left;
-    if (abs(left_dy) > deadzone) dy -= left_dy * speed_multiplier_left * (-1);
+    
+    if (abs(left_dx) > deadzone) dx += left_dx * speed_multiplier_left;
+    if (abs(left_dy) > deadzone) dy += left_dy * speed_multiplier_left * (-1);
     if (abs(right_dx) > deadzone) dx += right_dx * speed_multiplier_right * (-1);
     if (abs(right_dy) > deadzone) dy += right_dy * speed_multiplier_right;
-
+    
     if ((dx != 0) || (dy != 0)) {
-        report_mouse_t r = mousekey_get_report();
-        r.x = dx;
-        r.y = dy;
-        host_mouse_send(&r);
+        // report_mouse_t r = mousekey_get_report();
+        // r.x = dx;
+        // r.y = dy;
+        // host_mouse_send(&r);
     }
 
     // // Don't log during prod, it will destroy performance

@@ -17,6 +17,7 @@
       "pid": "0x3435",
       "device_version": "0.0.1"
   },
+  "modules": ["getreuer/custom_shift_keys"],
   "features": {
     "bootmagic": true,
     "extrakey": true,

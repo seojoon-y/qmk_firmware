@@ -14,7 +14,3 @@
 // #undef MATRIX_IO_DELAY   // or make sure it’s 0
 // #define USB_POLLING_INTERVAL_MS 1
 #define SPLIT_TRANSACTION_IDS_USER RIGHT_JOY
-
-#define I2C_DRIVER I2CD1
-#define I2C1_SDA_PIN GP8
-#define I2C1_SCL_PIN GP9

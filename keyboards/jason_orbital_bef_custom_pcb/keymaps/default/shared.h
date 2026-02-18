@@ -6,6 +6,5 @@ enum custom_keycodes {
     CNR_BL,
     CNR_BR,
     LMAGIC,
-    RMAGIC,
-    HAPTIC_TAP
+    RMAGIC
 };
