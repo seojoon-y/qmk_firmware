@@ -190,8 +190,8 @@ void housekeeping_task_user(void) {
             haptic_state = HAPTIC_REVERSE;
             haptic_timer = timer_read32() + 3;
         } else {
-            writePinLow(HAPTIC_IN1);
-            writePinLow(HAPTIC_IN2);
+            setPinInput(HAPTIC_IN1);
+            setPinInput(HAPTIC_IN2);
             haptic_state = HAPTIC_IDLE;
         }
     }
