@@ -2,11 +2,11 @@
   "manufacturer": "Seojoon Yeon",
   "maintainer": "Seojoon Yeon",
   "keyboard_name": "jason_orbital",
-  
+
   "processor": "RP2040",
   "bootloader": "rp2040",
   "diode_direction": "ROW2COL",
-  
+
   "matrix_size": {
     "rows": 6,
     "cols": 6
@@ -23,14 +23,6 @@
     "nkro": true
   },
 
-  "encoder": {
-    "enabled": true,
-    "rotary": [
-      { "pin_a": "GP9", "pin_b": "GP10", "resolution": 2 },
-      { "pin_a": "GP7", "pin_b": "GP8", "resolution": 2 }
-    ]
-  },
-  
   "split": {
     "enabled": true,
     "main": "left",

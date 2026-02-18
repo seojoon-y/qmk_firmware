@@ -14,9 +14,6 @@ SERIAL_DRIVER = vendor
 
 # POINTING_DEVICE_DRIVER = pmw3389 # Change to pmw3360 if you use that
 
-# Encoder
-ENCODER_ENABLE = yes
-ENCODER_MAP_ENABLE = no
 
 # Orbital mouse
 SRC += features/orbital_mouse.c

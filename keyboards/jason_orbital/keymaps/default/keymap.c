@@ -161,7 +161,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 
     switch (keycode) {
         case HAPTIC_TAP:
-            if (record->event.pressed) {
+            if (record->event.pressed && haptic_state == HAPTIC_IDLE) {
                 setPinOutput(HAPTIC_IN1);
                 setPinOutput(HAPTIC_IN2);
                 writePinHigh(HAPTIC_IN1);
@@ -188,10 +188,10 @@ void housekeeping_task_user(void) {
             writePinLow(HAPTIC_IN1);
             writePinHigh(HAPTIC_IN2);
             haptic_state = HAPTIC_REVERSE;
-            haptic_timer = timer_read32() + 3;
+            haptic_timer = timer_read32() + 1;
         } else {
-            setPinInput(HAPTIC_IN1);
-            setPinInput(HAPTIC_IN2);
+            writePinLow(HAPTIC_IN1);
+            writePinLow(HAPTIC_IN2);
             haptic_state = HAPTIC_IDLE;
         }
     }
@@ -208,23 +208,6 @@ void housekeeping_task_user(void) {
     }
 }
 
-bool encoder_update_user(uint8_t index, bool clockwise) {
-    // orbital_mouse_instant_step(1);
-    if (index == 0) {
-        if (clockwise) {
-            tap_code16(KC_DOWN);
-        } else {
-            tap_code16(KC_UP);
-        }
-    } else {
-        if (clockwise) {
-            tap_code16(KC_LEFT);
-        } else {
-            tap_code16(KC_RIGHT);
-        }
-    }
-    return false;
-}
 
 uint8_t get_orbital_angle_from_radians(float rad) {
     float two_pi = 6.283185307179586f;
