@@ -52,6 +52,24 @@ void keyboard_post_init_user(void) {
 
 static joy_s2m_t right_joy_cached;
 
+static bool is_mouse_mode = true;
+static uint16_t joy_keycode = KC_NO;
+static uint32_t joy_cooldown_timer = 0;
+#define JOY_DIR_COOLDOWN_MS 100
+
+typedef struct {
+    float    start_angle;
+    float    end_angle;
+    uint16_t keycode;
+} joy_sector_t;
+
+static const joy_sector_t joy_sectors[] = {
+    { (float)(M_PI / -4),      (float)(M_PI / 4),       KC_N },
+    { (float)(M_PI / 4),       (float)(3 * M_PI / 4),   KC_W },
+    { (float)(3 * M_PI / 4),   (float)(5 * M_PI / 4),   KC_S },
+    { (float)(5 * M_PI / 4),   (float)(7 * M_PI / 4),   KC_E },
+};
+
 
 // static void teleport_corner(uint8_t c) {
 //     digitizer_in_range_on();
@@ -76,8 +94,8 @@ static joy_s2m_t right_joy_cached;
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_APOLLO] = LAYOUT(
         LMAGIC,         KC_L,           KC_D,           KC_C,           TO(_HELIOS),    KC_ENT,
-        KC_B,           KC_R,           KC_T,           KC_S,           KC_V,           MO(_L_MOD),
-        HAPTIC_TAP,           KC_Q,           KC_M,           KC_W,           KC_G,           KC_SPC,
+        MOUSE_TOGGLE_TAP,     KC_R,           KC_T,           KC_S,           KC_V,           MO(_L_MOD),
+        KC_A,           KC_B,           KC_C,           KC_W,           KC_G,           KC_SPC,
 
         KC_TAB,         TO(_HESTIA),    KC_F,           KC_O,           KC_U,           RMAGIC,
         MO(_R_MOD),        KC_J,           KC_H,           KC_A,           KC_E,           KC_X,
@@ -160,14 +178,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     // }
 
     switch (keycode) {
-        case HAPTIC_TAP:
-            if (record->event.pressed && haptic_state == HAPTIC_IDLE) {
-                setPinOutput(HAPTIC_IN1);
-                setPinOutput(HAPTIC_IN2);
-                writePinHigh(HAPTIC_IN1);
-                writePinLow(HAPTIC_IN2);
-                haptic_state = HAPTIC_FORWARD;
-                haptic_timer = timer_read32() + 3;
+        case MOUSE_TOGGLE_TAP:
+            if (record->event.pressed) {
+                is_mouse_mode = !is_mouse_mode;
+                // Release any held direction key when switching modes
+                if (joy_keycode != KC_NO) {
+                    unregister_code(joy_keycode);
+                    joy_keycode = KC_NO;
+                }
+                if (haptic_state == HAPTIC_IDLE) {
+                    setPinOutput(HAPTIC_IN1);
+                    setPinOutput(HAPTIC_IN2);
+                    writePinHigh(HAPTIC_IN1);
+                    writePinLow(HAPTIC_IN2);
+                    haptic_state = HAPTIC_FORWARD;
+                    haptic_timer = timer_read32() + 3;
+                }
             }
             return false;
     }
@@ -225,21 +251,62 @@ void matrix_scan_user(void) {
 
     const float_t speed_multiplier_left = 0.03;
     const float_t speed_multiplier_right = 0.01;
-    const float_t deadzone = 30;
+    const float_t mouse_deadzone = 30;
+    const float_t dir_deadzone = 60;
 
     float_t dx = 0;
     float_t dy = 0;
 
-    if (abs(left_dx) > deadzone) dx -= left_dx * speed_multiplier_left;
-    if (abs(left_dy) > deadzone) dy -= left_dy * speed_multiplier_left * (-1);
-    if (abs(right_dx) > deadzone) dx += right_dx * speed_multiplier_right * (-1);
-    if (abs(right_dy) > deadzone) dy += right_dy * speed_multiplier_right;
+    if (abs(left_dx) > mouse_deadzone) dx -= left_dx * speed_multiplier_left;
+    if (abs(left_dy) > mouse_deadzone) dy -= left_dy * speed_multiplier_left * (-1);
+    if (abs(right_dx) > mouse_deadzone) dx += right_dx * speed_multiplier_right * (-1);
+    if (abs(right_dy) > mouse_deadzone) dy += right_dy * speed_multiplier_right;
 
-    if ((dx != 0) || (dy != 0)) {
-        report_mouse_t r = mousekey_get_report();
-        r.x = dx;
-        r.y = dy;
-        host_mouse_send(&r);
+    if (is_mouse_mode) {
+        if ((dx != 0) || (dy != 0)) {
+            report_mouse_t r = mousekey_get_report();
+            r.x = dx;
+            r.y = dy;
+            host_mouse_send(&r);
+        }
+    } else {
+        // Direction mode: map left joystick to 4 directional key presses
+        float magnitude = sqrtf((float)left_dx * left_dx + (float)left_dy * left_dy);
+        uint16_t new_keycode = KC_NO;
+        if (magnitude > dir_deadzone) {
+            float angle = atan2f(-(float)left_dy, (float)left_dx);
+            float cw_from_north = (float)(M_PI / 2) - angle;
+            if (cw_from_north < 0.0f) cw_from_north += (float)(2 * M_PI);
+            if (cw_from_north >= (float)(2 * M_PI)) cw_from_north -= (float)(2 * M_PI);
+            for (uint8_t i = 0; i < sizeof(joy_sectors) / sizeof(joy_sectors[0]); i++) {
+                float start = joy_sectors[i].start_angle;
+                float end   = joy_sectors[i].end_angle;
+                bool in_sector = start < 0.0f
+                    ? (cw_from_north >= (float)(2 * M_PI) + start || cw_from_north < end)
+                    : (cw_from_north >= start && cw_from_north < end);
+                if (in_sector) {
+                    new_keycode = joy_sectors[i].keycode;
+                    break;
+                }
+            }
+        }
+        if (new_keycode != joy_keycode) {
+            bool was_center = (joy_keycode == KC_NO);
+            joy_keycode = new_keycode;
+            if (new_keycode != KC_NO && was_center && timer_elapsed32(joy_cooldown_timer) >= JOY_DIR_COOLDOWN_MS) {
+                joy_cooldown_timer = timer_read32();
+                register_code(new_keycode);
+                unregister_code(new_keycode);
+                if (haptic_state == HAPTIC_IDLE) {
+                    setPinOutput(HAPTIC_IN1);
+                    setPinOutput(HAPTIC_IN2);
+                    writePinHigh(HAPTIC_IN1);
+                    writePinLow(HAPTIC_IN2);
+                    haptic_state = HAPTIC_FORWARD;
+                    haptic_timer = timer_read32() + 3;
+                }
+            }
+        }
     }
 
     // // Don't log during prod, it will destroy performance
