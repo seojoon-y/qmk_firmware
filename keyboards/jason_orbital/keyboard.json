@@ -5,7 +5,7 @@
 
   "processor": "RP2040",
   "bootloader": "rp2040",
-  "diode_direction": "ROW2COL",
+  "diode_direction": "COL2ROW",
 
   "matrix_size": {
     "rows": 8,

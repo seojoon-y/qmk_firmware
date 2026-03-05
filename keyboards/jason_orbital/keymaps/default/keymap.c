@@ -94,10 +94,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_Q,    KC_W,    KC_E,    KC_R,
         KC_1,    KC_2,    KC_3,    KC_4,
         // Right half: unused
-        _______, _______, _______, _______,
-        _______, _______, _______, _______,
-        _______, _______, _______, _______,
-        _______, _______, _______, _______
+        KC_Z,    KC_X,    _______,    KC_V,
+        KC_A,    KC_S,    KC_D,    KC_F,
+        KC_Q,    KC_W,    KC_E,    KC_R,
+        KC_1,    KC_2,    KC_3,    KC_4
     ),
 };
 
@@ -206,6 +206,7 @@ uint8_t get_orbital_angle_from_radians(float rad) {
 }
 
 void matrix_scan_user(void) {
+    return;
     const int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 500;
     const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 520;
     const int16_t right_dx = right_joy_cached.dx;
