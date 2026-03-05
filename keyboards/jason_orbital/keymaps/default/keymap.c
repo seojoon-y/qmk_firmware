@@ -31,12 +31,7 @@ typedef struct {
 #define ANALOG_JOYSTICK_Y_AXIS_PIN_RIGHT GP26
 
 enum layer_names {
-    _APOLLO,
-    _HELIOS,
-    _HESTIA,
-    _L_MOD,
-    _R_MOD,
-
+    _BASE,
 };
 
 
@@ -92,51 +87,18 @@ static const joy_sector_t joy_sectors[] = {
 // }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_APOLLO] = LAYOUT(
-        LMAGIC,         KC_L,           KC_D,           KC_C,           TO(_HELIOS),    KC_ENT,
-        MOUSE_TOGGLE_TAP,     KC_R,           KC_T,           KC_S,           KC_V,           MO(_L_MOD),
-        KC_A,           KC_B,           KC_C,           KC_W,           KC_G,           KC_SPC,
-
-        KC_TAB,         TO(_HESTIA),    KC_F,           KC_O,           KC_U,           RMAGIC,
-        MO(_R_MOD),        KC_J,           KC_H,           KC_A,           KC_E,           KC_X,
-        KC_BSPC,     KC_Y,           KC_P,           KC_K,           KC_Z,           KC_I
+    [_BASE] = LAYOUT(
+        // Left half: bottom row first, top row last
+        KC_Z,    KC_X,    KC_C,    KC_V,
+        KC_A,    KC_S,    KC_D,    KC_F,
+        KC_Q,    KC_W,    KC_E,    KC_R,
+        KC_1,    KC_2,    KC_3,    KC_4,
+        // Right half: unused
+        _______, _______, _______, _______,
+        _______, _______, _______, _______,
+        _______, _______, _______, _______,
+        _______, _______, _______, _______
     ),
-    [_HELIOS] = LAYOUT(
-        LMAGIC,         KC_SCLN,        _______,        _______,        TO(_HESTIA),    KC_ENT,
-        _______,        KC_COMM,        KC_DOT,         KC_QUOT,        KC_DQUO,        MO(_L_MOD),
-        KC_ESC,         S(KC_GRAVE),    KC_QUES,        _______,        _______,        KC_SPC,
-
-        KC_TAB,         TO(_APOLLO),    _______,        KC_AMPR,        KC_DLR,         RMAGIC,
-        MO(_R_MOD),        _______,        KC_LBRC,        KC_RBRC,        KC_LPRN,        KC_HASH,
-        KC_BSPC,     _______,        KC_COLN,        KC_BSLS,        KC_PERC,        KC_RPRN
-    ),
-    [_HESTIA] = LAYOUT(
-        LMAGIC,         KC_LT,          KC_GT,          KC_PIPE,        TO(_APOLLO),    KC_ENT,
-        KC_CIRC,        KC_EXLM,        KC_SLSH,        KC_EQL,         MS_BTN1,        MO(_L_MOD),
-        KC_PLUS,        KC_GRV,         KC_ASTR,        KC_AT,          _______,        KC_SPC,
-
-        KC_TAB,         TO(_HELIOS),    KC_7,           KC_8,           KC_9,           RMAGIC,
-        MO(_R_MOD),        MS_BTN2,        KC_0,           KC_1,           KC_2,           _______,
-        KC_BSPC,     _______,        KC_4,           KC_5,           KC_6,           KC_3
-    ),
-    [_L_MOD] = LAYOUT(
-        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,        KC_LALT,        KC_LGUI,        KC_LSFT,        _______,        _______,
-        KC_LCTL,        _______,        _______,        _______,        _______,        _______,
-
-        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,        _______,        _______,        _______,        _______,        _______
-    ),
-    [_R_MOD] = LAYOUT(
-        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,        _______,        _______,        _______,        _______,        _______,
-
-        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,        _______,        KC_LSFT,        KC_LGUI,        KC_LALT,        _______,
-        _______,        _______,        _______,        _______,        _______,        KC_LCTL
-    )
 };
 
 // CNR_TL, OM_U, CNR_TR,
