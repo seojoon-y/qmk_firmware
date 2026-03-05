@@ -13,8 +13,8 @@
 #include "timer.h"
 #include "gpio.h"
 
-#define HAPTIC_IN1 GP8
-#define HAPTIC_IN2 GP9
+#define HAPTIC_IN1 GP24
+#define HAPTIC_IN2 GP25
 typedef enum { HAPTIC_IDLE, HAPTIC_FORWARD, HAPTIC_REVERSE } haptic_state_t;
 static haptic_state_t haptic_state = HAPTIC_IDLE;
 static uint32_t haptic_timer = 0;
@@ -244,8 +244,8 @@ uint8_t get_orbital_angle_from_radians(float rad) {
 }
 
 void matrix_scan_user(void) {
-    const int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 520;
-    const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 505;
+    const int16_t left_dx = (int16_t)analogReadPin(ANALOG_JOYSTICK_X_AXIS_PIN_LEFT) - 500;
+    const int16_t left_dy = (int16_t)analogReadPin(ANALOG_JOYSTICK_Y_AXIS_PIN_LEFT) - 520;
     const int16_t right_dx = right_joy_cached.dx;
     const int16_t right_dy = right_joy_cached.dy;
 
@@ -303,7 +303,7 @@ void matrix_scan_user(void) {
                     writePinHigh(HAPTIC_IN1);
                     writePinLow(HAPTIC_IN2);
                     haptic_state = HAPTIC_FORWARD;
-                    haptic_timer = timer_read32() + 3;
+                    haptic_timer = timer_read32() + 2;
                 }
             }
         }
